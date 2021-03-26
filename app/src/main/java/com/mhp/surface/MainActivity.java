@@ -30,7 +30,7 @@ import org.xwalk.core.XWalkView;
 
 public class MainActivity extends XWalkActivity {
 
-    String url = null;
+    String url = "http://10.100.110.2:50000/apis/tv/dist/index.html#/screen?site=3123&line=10ZZ01";
 
     String initContent = "<html><body><h1 style='text-align:center;font-size:10rem;'>" + Util.getHostIP() + "</h1></body></html>";
 
@@ -139,7 +139,7 @@ public class MainActivity extends XWalkActivity {
 
             SharedPreferences sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
 
-            url = sharedPreferences.getString("url", null);
+            url = sharedPreferences.getString("url", url);
 
 
             show(url);
