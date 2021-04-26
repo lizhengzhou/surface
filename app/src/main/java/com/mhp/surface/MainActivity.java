@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -17,6 +18,7 @@ import android.os.Message;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.widget.Toast;
@@ -30,7 +32,7 @@ import org.xwalk.core.XWalkView;
 
 public class MainActivity extends XWalkActivity {
 
-    String url = "http://10.100.110.2:50000/apis/tv/dist/index.html#/screen?site=3123&line=10ZZ01";
+    String url = "file:///android_asset/index.html";
 
     String initContent = "<html><body><h1 style='text-align:center;font-size:10rem;'>" + Util.getHostIP() + "</h1></body></html>";
 
@@ -41,9 +43,11 @@ public class MainActivity extends XWalkActivity {
 
     Handler mHideHandler = new Handler();
 
-    ConfigHandler configHandler = new ConfigHandler();
+    NotifyHandler notifyHandler = new NotifyHandler();
 
     ConfigService configService;
+
+    UHFObject uhf;
 
     Boolean onXWalkReady = false;
 
@@ -57,7 +61,10 @@ public class MainActivity extends XWalkActivity {
 
         try {
 
-            configService = new ConfigService(configHandler);
+
+            uhf = new UHFObject(this, notifyHandler);
+
+            configService = new ConfigService(notifyHandler);
 
             configService.start();
 
@@ -93,7 +100,7 @@ public class MainActivity extends XWalkActivity {
     protected void onXWalkReady() {
 
         try {
-            mWebView = (XWalkView) findViewById(R.id.xwalkWebView);
+            mWebView = findViewById(R.id.xwalkWebView);
 
             mWebSettings = mWebView.getSettings();
 
@@ -137,6 +144,10 @@ public class MainActivity extends XWalkActivity {
 
             onXWalkReady = true;
 
+
+            mWebView.addJavascriptInterface(uhf, UHFObject.TAG);
+
+
             SharedPreferences sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
 
             url = sharedPreferences.getString("url", url);
@@ -169,17 +180,26 @@ public class MainActivity extends XWalkActivity {
                 Toast.makeText(getApplicationContext(), "Show init " + url, Toast.LENGTH_LONG).show();
 
                 mWebView.loadDataWithBaseURL(null, initContent, "text/html", "utf-8", null);
+
             } else {
 
                 Toast.makeText(getApplicationContext(), "Show " + url, Toast.LENGTH_LONG).show();
 
                 mWebView.load(url, null);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
 
+    }
+
+
+    //fix -> Binary XML file line #9: Error inflating class android.webkit.WebView
+    @Override
+    public AssetManager getAssets() {
+        return getResources().getAssets();
     }
 
 
@@ -191,6 +211,9 @@ public class MainActivity extends XWalkActivity {
                 mWebView.pauseTimers();
                 mWebView.onHide();
             }
+            if (uhf != null) {
+                uhf.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -201,6 +224,9 @@ public class MainActivity extends XWalkActivity {
     protected void onResume() {
         super.onResume();
         try {
+            if (uhf != null) {
+                uhf.open();
+            }
             if (mWebView != null) {
                 mWebView.resumeTimers();
                 mWebView.onShow();
@@ -220,6 +246,9 @@ public class MainActivity extends XWalkActivity {
             }
             if (configService != null) {
                 configService.stop();
+            }
+            if (uhf != null) {
+                uhf.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -250,29 +279,44 @@ public class MainActivity extends XWalkActivity {
         }
     };
 
-    class ConfigHandler extends Handler {
+    class NotifyHandler extends Handler {
 
         @Override
         public void handleMessage(@NonNull Message msg) {
-            try {
+            switch (msg.what) {
+                case 1:
+                    try {
 
-                url = msg.getData().getString("url");
+                        url = msg.getData().getString("url");
 
-                //步骤1：创建一个SharedPreferences对象
-                SharedPreferences sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
-                //步骤2： 实例化SharedPreferences.Editor对象
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                //步骤3：将获取过来的值放入文件
-                editor.putString("url", url);
-                //步骤4：提交
-                editor.commit();
+                        //步骤1：创建一个SharedPreferences对象
+                        SharedPreferences sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+                        //步骤2： 实例化SharedPreferences.Editor对象
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        //步骤3：将获取过来的值放入文件
+                        editor.putString("url", url);
+                        //步骤4：提交
+                        editor.commit();
 
 
-                mWebView.load(url, null);
-            } catch (Exception e) {
-                e.printStackTrace();
+                        show(url);
+
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                        e.printStackTrace();
+                    }
+                    break;
+                case 2:
+
+                    String tagid = msg.getData().getString("tagid");
+
+                    if (mWebView != null) {
+                        mWebView.evaluateJavascript(UHFObject.TAG + ".onTag" + "('" + tagid + "')", null);
+                    }
+
+                    break;
+
             }
-
 
         }
     }

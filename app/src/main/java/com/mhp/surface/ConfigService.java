@@ -12,18 +12,18 @@ import fi.iki.elonen.NanoHTTPD;
 
 public class ConfigService extends NanoHTTPD {
 
-    MainActivity.ConfigHandler handler;
+    MainActivity.NotifyHandler handler;
 
     Handler mstartHandler = new Handler();
 
-    public ConfigService(MainActivity.ConfigHandler handler) {
+    public ConfigService(MainActivity.NotifyHandler handler) {
         super(6421);
         this.handler = handler;
     }
 
     public void start() {
         try {
-            mstartHandler.postDelayed(mstartRunnable, 60000);
+            mstartHandler.postDelayed(mstartRunnable, 5000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -50,6 +50,7 @@ public class ConfigService extends NanoHTTPD {
                 bundle.putString("url", url);
 
                 Message msg = new Message();
+                msg.what = 1;
                 msg.setData(bundle);
 
                 handler.sendMessage(msg);
