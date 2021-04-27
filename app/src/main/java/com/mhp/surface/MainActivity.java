@@ -28,6 +28,9 @@ import org.xwalk.core.XWalkSettings;
 import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends XWalkActivity {
 
     String _url = null;
@@ -49,6 +52,21 @@ public class MainActivity extends XWalkActivity {
 
 
     AlertDialog alertDialog;
+
+    Timer mTimer = new Timer(true);
+
+    TimerTask mRefreshTimerTask = new TimerTask() {
+        @Override
+        public void run() {
+
+            Message msg = new Message();
+            msg.what = 1;
+            configHandler.sendMessage(msg);
+
+        }
+    };
+
+    int refreshDuration = 30 * 60 * 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +174,8 @@ public class MainActivity extends XWalkActivity {
             registerReceiver(new WifiChangedReceiver(), filter);
 
 
+            mTimer.schedule(mRefreshTimerTask, refreshDuration, refreshDuration);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -221,6 +241,9 @@ public class MainActivity extends XWalkActivity {
             if (configService != null) {
                 configService.stop();
             }
+            if (mTimer != null) {
+                mTimer.cancel();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -254,28 +277,41 @@ public class MainActivity extends XWalkActivity {
 
         @Override
         public void handleMessage(@NonNull Message msg) {
-            try {
 
-                _url = msg.getData().getString("url");
+            switch (msg.what) {
 
-                //步骤1：创建一个SharedPreferences对象
-                SharedPreferences sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
-                //步骤2： 实例化SharedPreferences.Editor对象
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                //步骤3：将获取过来的值放入文件
-                editor.putString("url", _url);
-                //步骤4：提交
-                editor.commit();
+                case NotifyType.CONFIG_URL:
 
-                mWebView.clearCache(true);
+                    try {
 
-                show(_url);
+                        _url = msg.getData().getString("url");
 
-            } catch (Exception e) {
-                e.printStackTrace();
+                        //步骤1：创建一个SharedPreferences对象
+                        SharedPreferences sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+                        //步骤2： 实例化SharedPreferences.Editor对象
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        //步骤3：将获取过来的值放入文件
+                        editor.putString("url", _url);
+                        //步骤4：提交
+                        editor.commit();
+
+                        mWebView.clearCache(true);
+
+                        show(_url);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    break;
+
+                case NotifyType.REGRESH:
+
+                    mWebView.reload(XWalkView.RELOAD_IGNORE_CACHE);
+
+                    break;
+
             }
-
-
         }
     }
 

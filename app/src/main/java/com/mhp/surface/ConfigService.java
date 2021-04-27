@@ -52,6 +52,8 @@ public class ConfigService extends NanoHTTPD {
                 bundle.putString("url", url);
 
                 Message msg = new Message();
+
+                msg.what=1;
                 msg.setData(bundle);
 
                 handler.sendMessage(msg);
