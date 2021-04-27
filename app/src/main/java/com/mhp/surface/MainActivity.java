@@ -30,7 +30,7 @@ import org.xwalk.core.XWalkView;
 
 public class MainActivity extends XWalkActivity {
 
-    String url = null;
+    String _url = null;
 
     String initContent = "<html><body><h1 style='text-align:center;font-size:10rem;'>" + Util.getHostIPhtml() + "</h1></body></html>";
 
@@ -139,10 +139,10 @@ public class MainActivity extends XWalkActivity {
 
             SharedPreferences sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
 
-            url = sharedPreferences.getString("url", url);
+            _url = sharedPreferences.getString("url", _url);
 
 
-            show(url);
+            show(_url);
 
 
             // turn on debugging
@@ -256,18 +256,20 @@ public class MainActivity extends XWalkActivity {
         public void handleMessage(@NonNull Message msg) {
             try {
 
-                url = msg.getData().getString("url");
+                _url = msg.getData().getString("url");
 
                 //步骤1：创建一个SharedPreferences对象
                 SharedPreferences sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
                 //步骤2： 实例化SharedPreferences.Editor对象
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 //步骤3：将获取过来的值放入文件
-                editor.putString("url", url);
+                editor.putString("url", _url);
                 //步骤4：提交
                 editor.commit();
 
-                show(url);
+                mWebView.clearCache(true);
+
+                show(_url);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -298,7 +300,7 @@ public class MainActivity extends XWalkActivity {
                         Log.e("TAG", "isConnected:" + isConnected);
 
                         if (isConnected) {
-                            mWebView.reload(XWalkView.RELOAD_IGNORE_CACHE);
+                            show(_url);
                         }
 
                         Toast.makeText(context, "Wifi:" + (isConnected ? "Connected" : "DisConnected"), Toast.LENGTH_LONG).show();
