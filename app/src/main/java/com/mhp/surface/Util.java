@@ -6,7 +6,9 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 public class Util {
 
@@ -15,9 +17,9 @@ public class Util {
      *
      * @return
      */
-    public static String getHostIP() {
+    public static List<String> getHostIP() {
 
-        String hostIp = "";
+        List<String> hostIp = new ArrayList<String>();
         try {
             Enumeration nis = NetworkInterface.getNetworkInterfaces();
             InetAddress ia = null;
@@ -31,7 +33,7 @@ public class Util {
                     }
                     String ip = ia.getHostAddress();
                     if (!"127.0.0.1".equals(ip)) {
-                        hostIp += ip + "\n";
+                        hostIp.add(ip);
                     }
                 }
             }
@@ -40,6 +42,20 @@ public class Util {
             e.printStackTrace();
         }
         return hostIp;
+    }
 
+
+    public static String getHostIPhtml() {
+
+        String str = "";
+
+        List<String> hostIps = getHostIP();
+
+        for (String ip : hostIps) {
+
+            str += ip + "</br>";
+
+        }
+        return str;
     }
 }

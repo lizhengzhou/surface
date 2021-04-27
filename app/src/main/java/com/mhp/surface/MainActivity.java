@@ -33,8 +33,7 @@ import org.xwalk.core.XWalkView;
 public class MainActivity extends XWalkActivity {
 
     String url = "file:///android_asset/index.html";
-
-    String initContent = "<html><body><h1 style='text-align:center;font-size:10rem;'>" + Util.getHostIP() + "</h1></body></html>";
+    String initContent = "<html><body><h1 style='text-align:center;font-size:10rem;'>" + Util.getHostIPhtml() + "</h1></body></html>";
 
     int UI_ANIMATION_DELAY = 300;
 
@@ -179,13 +178,13 @@ public class MainActivity extends XWalkActivity {
 
                 Toast.makeText(getApplicationContext(), "Show init " + url, Toast.LENGTH_LONG).show();
 
-                mWebView.loadDataWithBaseURL(null, initContent, "text/html", "utf-8", null);
+                mWebView.loadData(initContent, "text/html", "utf-8");
 
             } else {
 
                 Toast.makeText(getApplicationContext(), "Show " + url, Toast.LENGTH_LONG).show();
 
-                mWebView.load(url, null);
+                mWebView.loadUrl(url);
 
             }
         } catch (Exception e) {
@@ -279,10 +278,12 @@ public class MainActivity extends XWalkActivity {
         }
     };
 
+
     class NotifyHandler extends Handler {
 
         @Override
         public void handleMessage(@NonNull Message msg) {
+
             switch (msg.what) {
                 case 1:
                     try {
@@ -297,7 +298,6 @@ public class MainActivity extends XWalkActivity {
                         editor.putString("url", url);
                         //步骤4：提交
                         editor.commit();
-
 
                         show(url);
 
