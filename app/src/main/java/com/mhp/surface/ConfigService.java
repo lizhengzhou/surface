@@ -12,6 +12,8 @@ import fi.iki.elonen.NanoHTTPD;
 
 public class ConfigService extends NanoHTTPD {
 
+    String url = null;
+
     MainActivity.ConfigHandler handler;
 
     Handler mstartHandler = new Handler();
@@ -23,7 +25,7 @@ public class ConfigService extends NanoHTTPD {
 
     public void start() {
         try {
-            mstartHandler.postDelayed(mstartRunnable, 60000);
+            mstartHandler.postDelayed(mstartRunnable, 5000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -36,17 +38,17 @@ public class ConfigService extends NanoHTTPD {
 
     @Override
     public Response serve(IHTTPSession session) {
-        String url = null;
+
         try {
 
             Map<String, String> parms = session.getParms();
 
             if (parms.containsKey("url")) {
+
                 url = parms.get("url");
-            }
-            if (null != url && !"".equals(url)) {
 
                 Bundle bundle = new Bundle();
+
                 bundle.putString("url", url);
 
                 Message msg = new Message();
@@ -55,7 +57,6 @@ public class ConfigService extends NanoHTTPD {
                 handler.sendMessage(msg);
 
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
