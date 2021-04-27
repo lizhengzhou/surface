@@ -297,6 +297,10 @@ public class MainActivity extends XWalkActivity {
                         boolean isConnected = state == NetworkInfo.State.CONNECTED;
                         Log.e("TAG", "isConnected:" + isConnected);
 
+                        if (isConnected) {
+                            mWebView.reload(XWalkView.RELOAD_IGNORE_CACHE);
+                        }
+
                         Toast.makeText(context, "Wifi:" + (isConnected ? "Connected" : "DisConnected"), Toast.LENGTH_LONG).show();
 
                     }
