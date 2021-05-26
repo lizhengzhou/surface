@@ -33,7 +33,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends XWalkActivity {
 
-    String _url = null;
+    String _url = "http://lwmesprd.cnhtcerp.com:8001/apis/tv/dist/index.html#/lineScreen?site=3123&line=L1-ZP01";
 
     String initContent = "<html><body><h1 style='text-align:center;font-size:10rem;'>" + Util.getHostIPhtml() + "</h1></body></html>";
 
@@ -50,8 +50,6 @@ public class MainActivity extends XWalkActivity {
 
     Boolean onXWalkReady = false;
 
-
-    AlertDialog alertDialog;
 
     Timer mTimer = new Timer(true);
 
@@ -79,26 +77,24 @@ public class MainActivity extends XWalkActivity {
 
             configService.start();
 
-            mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
+//            mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
 
 
-            SoftKeyBoardListener.setListener(MainActivity.this, new SoftKeyBoardListener.OnSoftKeyBoardChangeListener() {
-                @Override
-                public void keyBoardShow(int height) {
-                    // Schedule a runnable to remove the status and navigation bar after a delay
-                    mHideHandler.removeCallbacks(mHideRunnable);
-                    mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
-                }
-
-                @Override
-                public void keyBoardHide(int height) {
-                    // Schedule a runnable to remove the status and navigation bar after a delay
-                    mHideHandler.removeCallbacks(mHideRunnable);
-                    mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
-                }
-            });
-
-            alertDialog = new AlertDialog.Builder(this).setTitle("提示信息").setMessage("NetWork DisConnected !").create();
+//            SoftKeyBoardListener.setListener(MainActivity.this, new SoftKeyBoardListener.OnSoftKeyBoardChangeListener() {
+//                @Override
+//                public void keyBoardShow(int height) {
+//                    // Schedule a runnable to remove the status and navigation bar after a delay
+//                    mHideHandler.removeCallbacks(mHideRunnable);
+//                    mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
+//                }
+//
+//                @Override
+//                public void keyBoardHide(int height) {
+//                    // Schedule a runnable to remove the status and navigation bar after a delay
+//                    mHideHandler.removeCallbacks(mHideRunnable);
+//                    mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
+//                }
+//            });
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -138,18 +134,13 @@ public class MainActivity extends XWalkActivity {
 
                 @Override
                 public void onLoadFinished(XWalkView view, String url) {
-                    if (alertDialog.isShowing()) {
-                        alertDialog.hide();
-                    }
+
                 }
 
                 @Override
                 public void onReceivedLoadError(XWalkView view, int errorCode, String description, String failingUrl) {
                     String msg = description + "\n" + failingUrl;
-                    alertDialog.setMessage(msg);
-                    if (!alertDialog.isShowing()) {
-                        alertDialog.show();
-                    }
+
                 }
             });
 
@@ -174,7 +165,7 @@ public class MainActivity extends XWalkActivity {
             registerReceiver(new WifiChangedReceiver(), filter);
 
 
-            mTimer.schedule(mRefreshTimerTask, refreshDuration, refreshDuration);
+//            mTimer.schedule(mRefreshTimerTask, refreshDuration, refreshDuration);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -250,28 +241,28 @@ public class MainActivity extends XWalkActivity {
 
     }
 
-
-    private final Runnable mHideRunnable = new Runnable() {
-        @SuppressLint("InlinedApi")
-        @Override
-        public void run() {
-            // Delayed removal of status and navigation bar
-            try {
-                // Note that some of these constants are new as of API 16 (Jelly Bean)
-                // and API 19 (KitKat). It is safe to use them, as they are inlined
-                // at compile-time and do nothing on earlier devices.
-                mWebView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-    };
+//
+//    private final Runnable mHideRunnable = new Runnable() {
+//        @SuppressLint("InlinedApi")
+//        @Override
+//        public void run() {
+//            // Delayed removal of status and navigation bar
+//            try {
+//                // Note that some of these constants are new as of API 16 (Jelly Bean)
+//                // and API 19 (KitKat). It is safe to use them, as they are inlined
+//                // at compile-time and do nothing on earlier devices.
+//                mWebView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+//                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+//                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+//                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//        }
+//    };
 
     class ConfigHandler extends Handler {
 
