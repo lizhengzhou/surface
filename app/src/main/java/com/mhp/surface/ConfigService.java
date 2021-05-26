@@ -53,7 +53,7 @@ public class ConfigService extends NanoHTTPD {
 
                 Message msg = new Message();
 
-                msg.what=1;
+                msg.what = NotifyType.CONFIG_URL;
                 msg.setData(bundle);
 
                 handler.sendMessage(msg);

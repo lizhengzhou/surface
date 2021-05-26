@@ -1,7 +1,6 @@
 package com.mhp.surface;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +16,6 @@ import android.os.Message;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.View;
 import android.webkit.WebSettings;
 import android.widget.Toast;
 
@@ -25,11 +23,7 @@ import org.xwalk.core.XWalkActivity;
 import org.xwalk.core.XWalkPreferences;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkSettings;
-import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends XWalkActivity {
 
@@ -37,12 +31,8 @@ public class MainActivity extends XWalkActivity {
 
     String initContent = "<html><body><h1 style='text-align:center;font-size:10rem;'>" + Util.getHostIPhtml() + "</h1></body></html>";
 
-    int UI_ANIMATION_DELAY = 300;
-
     XWalkView mWebView;
     XWalkSettings mWebSettings;
-
-    Handler mHideHandler = new Handler();
 
     ConfigHandler configHandler = new ConfigHandler();
 
@@ -50,21 +40,6 @@ public class MainActivity extends XWalkActivity {
 
     Boolean onXWalkReady = false;
 
-
-    Timer mTimer = new Timer(true);
-
-    TimerTask mRefreshTimerTask = new TimerTask() {
-        @Override
-        public void run() {
-
-            Message msg = new Message();
-            msg.what = 1;
-            configHandler.sendMessage(msg);
-
-        }
-    };
-
-    int refreshDuration = 30 * 60 * 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,25 +51,6 @@ public class MainActivity extends XWalkActivity {
             configService = new ConfigService(configHandler);
 
             configService.start();
-
-//            mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
-
-
-//            SoftKeyBoardListener.setListener(MainActivity.this, new SoftKeyBoardListener.OnSoftKeyBoardChangeListener() {
-//                @Override
-//                public void keyBoardShow(int height) {
-//                    // Schedule a runnable to remove the status and navigation bar after a delay
-//                    mHideHandler.removeCallbacks(mHideRunnable);
-//                    mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
-//                }
-//
-//                @Override
-//                public void keyBoardHide(int height) {
-//                    // Schedule a runnable to remove the status and navigation bar after a delay
-//                    mHideHandler.removeCallbacks(mHideRunnable);
-//                    mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
-//                }
-//            });
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -117,9 +73,6 @@ public class MainActivity extends XWalkActivity {
             mWebSettings.setLoadWithOverviewMode(true);
             mWebSettings.setDomStorageEnabled(true);
 
-            mWebView.setUIClient(new XWalkUIClient(mWebView) {
-
-            });
 
             mWebView.setResourceClient(new XWalkResourceClient(mWebView) {
                 @Override
@@ -130,17 +83,6 @@ public class MainActivity extends XWalkActivity {
                         return true;
                     }
                     return false;
-                }
-
-                @Override
-                public void onLoadFinished(XWalkView view, String url) {
-
-                }
-
-                @Override
-                public void onReceivedLoadError(XWalkView view, int errorCode, String description, String failingUrl) {
-                    String msg = description + "\n" + failingUrl;
-
                 }
             });
 
@@ -164,9 +106,6 @@ public class MainActivity extends XWalkActivity {
             filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
             registerReceiver(new WifiChangedReceiver(), filter);
 
-
-//            mTimer.schedule(mRefreshTimerTask, refreshDuration, refreshDuration);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -177,12 +116,12 @@ public class MainActivity extends XWalkActivity {
         try {
             if (null == url || "".equals(url)) {
 
-                Toast.makeText(getApplicationContext(), "Show init " + url, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Show init " + url, Toast.LENGTH_SHORT).show();
 
                 mWebView.loadData(initContent, "text/html", "utf-8");
             } else {
 
-                Toast.makeText(getApplicationContext(), "Show " + url, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Show " + url, Toast.LENGTH_SHORT).show();
 
                 mWebView.loadUrl(url);
             }
@@ -232,37 +171,11 @@ public class MainActivity extends XWalkActivity {
             if (configService != null) {
                 configService.stop();
             }
-            if (mTimer != null) {
-                mTimer.cancel();
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
-
-//
-//    private final Runnable mHideRunnable = new Runnable() {
-//        @SuppressLint("InlinedApi")
-//        @Override
-//        public void run() {
-//            // Delayed removal of status and navigation bar
-//            try {
-//                // Note that some of these constants are new as of API 16 (Jelly Bean)
-//                // and API 19 (KitKat). It is safe to use them, as they are inlined
-//                // at compile-time and do nothing on earlier devices.
-//                mWebView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-//                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-//                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-//                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//
-//        }
-//    };
 
     class ConfigHandler extends Handler {
 
@@ -296,12 +209,6 @@ public class MainActivity extends XWalkActivity {
 
                     break;
 
-                case NotifyType.REGRESH:
-
-                    mWebView.reload(XWalkView.RELOAD_IGNORE_CACHE);
-
-                    break;
-
             }
         }
     }
@@ -330,7 +237,7 @@ public class MainActivity extends XWalkActivity {
                             show(_url);
                         }
 
-                        Toast.makeText(context, "Wifi:" + (isConnected ? "Connected" : "DisConnected"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "Wifi:" + (isConnected ? "Connected" : "DisConnected"), Toast.LENGTH_SHORT).show();
 
                     }
                 }
