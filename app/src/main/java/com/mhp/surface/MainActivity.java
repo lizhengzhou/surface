@@ -33,7 +33,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends XWalkActivity {
 
-    String _url = "http://lwmesprd.cnhtcerp.com:8001/apis/tv/dist/index.html#/lineScreen?site=3123&line=L1-ZP01";
+    String _url = null;
 
     String initContent = "<html><body><h1 style='text-align:center;font-size:10rem;'>" + Util.getHostIPhtml() + "</h1></body></html>";
 
