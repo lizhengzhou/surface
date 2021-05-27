@@ -27,7 +27,7 @@ import org.xwalk.core.XWalkView;
 
 public class MainActivity extends XWalkActivity {
 
-    String _url = null;
+    String _url = "http://lwmesprd.cnhtcerp.com:8001/apis/pad";
 
     String initContent = "<html><body><h1 style='text-align:center;font-size:10rem;'>" + Util.getHostIPhtml() + "</h1></body></html>";
 
