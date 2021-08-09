@@ -40,6 +40,7 @@ public class MainActivity extends XWalkActivity {
 
     Boolean onXWalkReady = false;
 
+    WifiChangedReceiver wifiChangedReceiver = new WifiChangedReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +105,7 @@ public class MainActivity extends XWalkActivity {
             filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
             filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
             filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-            registerReceiver(new WifiChangedReceiver(), filter);
+            registerReceiver(wifiChangedReceiver, filter);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -165,6 +166,7 @@ public class MainActivity extends XWalkActivity {
     protected void onDestroy() {
         super.onDestroy();
         try {
+            unregisterReceiver(wifiChangedReceiver);
             if (mWebView != null) {
                 mWebView.onDestroy();
             }
